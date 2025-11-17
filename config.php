@@ -2,7 +2,7 @@
 session_start();
 
 $db_host = '127.0.0.1';
-$db_name = 'gallery';
+$db_name = 'gallery_vinn';
 $db_user = 'root';
 $db_pass = '';
 
