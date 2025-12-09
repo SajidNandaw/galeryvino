@@ -1,24 +1,6 @@
 CREATE DATABASE IF NOT EXISTS gallery_vinn CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE gallery_vinn;
 
-CREATE TABLE IF NOT EXISTS tb_masyarakat (
-  nik VARCHAR(20) PRIMARY KEY,
-  nama VARCHAR(100) NOT NULL,
-  telp VARCHAR(15),
-  username VARCHAR(50) UNIQUE,
-  password VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS tb_pengaduan (
-  id_pengaduan INT AUTO_INCREMENT PRIMARY KEY,
-  tgl_pengaduan DATE NOT NULL,
-  nik VARCHAR(20),
-  isi_laporan TEXT,
-  foto VARCHAR(255),
-  status ENUM('0','proses','selesai') DEFAULT '0',
-  FOREIGN KEY (nik) REFERENCES tb_masyarakat(nik)
-);
-
 CREATE TABLE IF NOT EXISTS user (
   UserID INT AUTO_INCREMENT PRIMARY KEY,
   Username VARCHAR(50) UNIQUE NOT NULL,
