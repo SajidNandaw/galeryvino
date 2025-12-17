@@ -34,7 +34,8 @@ body{background:radial-gradient(circle at top,#141414 0%,#0a0a0a 100%);color:#f1
 .comment-actions button:hover{color:#ff4444;}
 </style>
 </head>
-<body class="min-h-screen">
+
+<body class="min-h-screen flex flex-col">
 
 <!-- Navbar -->
 <nav class="bg-black/90 border-b border-red-700 p-4 flex justify-between items-center shadow-lg">
@@ -73,10 +74,18 @@ body{background:radial-gradient(circle at top,#141414 0%,#0a0a0a 100%);color:#f1
         <form method="post" action="like.php" class="inline">
           <input type="hidden" name="FotoID" value="<?=$p['FotoID']?>">
           <button type="submit" class="hover:text-white transition">
-            ❤️ <?php $c=$pdo->prepare('SELECT COUNT(*) FROM likefoto WHERE FotoID=?');$c->execute([$p['FotoID']]);echo $c->fetchColumn();?> suka
+            ❤️ <?php 
+              $c=$pdo->prepare('SELECT COUNT(*) FROM likefoto WHERE FotoID=?');
+              $c->execute([$p['FotoID']]);
+              echo $c->fetchColumn();
+            ?> suka
           </button>
         </form>
+
         <button type="button" class="cursor-pointer hover:text-white transition" onclick="openOverlay(<?=$p['FotoID']?>)">💬 komentar</button>
+
+        <!-- SHARE -->
+        <button type="button" class="cursor-pointer hover:text-white transition" onclick="sharePhoto(<?=$p['FotoID']?>)">🔗 share</button>
       </div>
 
       <h3 class="font-semibold text-white text-sm mb-1"><?=htmlspecialchars($p['JudulFoto'])?></h3>
@@ -110,7 +119,7 @@ body{background:radial-gradient(circle at top,#141414 0%,#0a0a0a 100%);color:#f1
   </div>
 </div>
 
-<footer class="text-center text-gray-400 text-sm py-6 border-t border-red-800 mt-10">
+<footer class="text-center text-gray-400 text-sm py-6 border-t border-red-800 mt-auto">
   © 2025 <span class="text-white font-semibold">Galeri Vinn</span>
 </footer>
 
@@ -153,16 +162,40 @@ function openOverlay(id){
   });
   document.getElementById('overlayComments').innerHTML=html||'<p class="text-gray-500 text-sm">Belum ada komentar.</p>';
 }
-function closeOverlay(){document.getElementById('commentOverlay').classList.remove('active');}
+
+function closeOverlay(){
+  document.getElementById('commentOverlay').classList.remove('active');
+}
+
 function toggleMenu(id){
-  document.querySelectorAll('.menu').forEach(m=>{if(m.id!=='menu'+id)m.classList.remove('active');});
+  document.querySelectorAll('.menu').forEach(m=>{
+    if(m.id!=='menu'+id) m.classList.remove('active');
+  });
   document.getElementById('menu'+id).classList.toggle('active');
 }
+
 window.onclick=e=>{
   if(!e.target.closest('.menu')&&!e.target.closest('.menu-btn')){
     document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
   }
 };
+
+// SHARE FUNCTION
+function sharePhoto(id){
+  const foto = photoData.find(p => p.FotoID == id);
+  const url = window.location.origin + '/uploads/' + foto.LokasiFile;
+
+  if (navigator.share) {
+    navigator.share({
+      title: foto.JudulFoto,
+      text: foto.DeskripsiFoto,
+      url: url
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert('Link foto berhasil disalin!');
+  }
+}
 
 function editKomentar(id, isi){
   const newIsi = prompt("Edit komentar kamu:", isi);
@@ -174,6 +207,7 @@ function editKomentar(id, isi){
     }).then(()=>location.reload());
   }
 }
+
 function hapusKomentar(id){
   if(confirm("Yakin ingin menghapus komentar ini?")){
     fetch('delete_comment.php',{
